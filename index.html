@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Système d'Inventaire</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 font-[Poppins]">
+
+  <!-- Container de Login -->
+  <div id="login-container" class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">Connexion</h2>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+          <input type="text" id="username" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+          <input type="password" id="password" required
+                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        </div>
+        <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          Se connecter
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application d'Inventaire -->
+  <div id="app-container" class="hidden">
+    <div class="min-h-screen">
+      <!-- Header -->
+      <header class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+          <h1 class="text-3xl font-semibold">Système d'Inventaire</h1>
+          <!-- Affichage du compte connecté et bouton déconnexion -->
+          <div id="user-info" class="flex items-center space-x-4">
+            <span id="logged-user" class="font-medium"></span>
+            <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">Déconnexion</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Formulaire de Réception -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">
+              <i class="fas fa-box-open mr-2"></i>Réception des éléments
+            </h2>
+            <form id="reception-form" class="space-y-4">
+              <div>
+                <label for="type-reception" class="block text-sm font-medium text-gray-700">Type d'élément</label>
+                <input type="text" id="type-reception" required list="item-types-list"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <datalist id="item-types-list">
+                  <!-- Options renseignées dynamiquement -->
+                </datalist>
+              </div>
+              <div>
+                <label for="quantity-reception" class="block text-sm font-medium text-gray-700">Quantité</label>
+                <input type="number" id="quantity-reception" required min="1"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+              </div>
+              <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Enregistrer la réception
+              </button>
+            </form>
+          </div>
+
+          <!-- Formulaire de Sortie -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">
+              <i class="fas fa-share-square mr-2"></i>Sortie des éléments
+            </h2>
+            <form id="sortie-form" class="space-y-4">
+              <div>
+                <label for="type-sortie" class="block text-sm font-medium text-gray-700">Type d'élément</label>
+                <select id="type-sortie" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <option value="">Sélectionner un type</option>
+                  <!-- Options ajoutées dynamiquement depuis le stock -->
+                </select>
+              </div>
+              <div>
+                <label for="quantity-sortie" class="block text-sm font-medium text-gray-700">Quantité</label>
+                <input type="number" id="quantity-sortie" required min="1"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+              </div>
+              <div>
+                <label for="service" class="block text-sm font-medium text-gray-700">Service destinataire</label>
+                <select id="service" required
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <option value="">Sélectionner un service</option>
+                  <option value="Service du secrétariat particulier">Service du secrétariat particulier</option>
+                  <option value="Service des affaires administratives">Service des affaires administratives</option>
+                  <option value="Service de l'état civil et de la rectification">Service de l'état civil et de la rectification</option>
+                  <option value="Service de la gestion financière et comptable">Service de la gestion financière et comptable</option>
+                  <option value="Service de l'urbanisme">Service de l'urbanisme</option>
+                  <option value="Service des travaux">Service des travaux</option>
+                  <option value="Service de l'animation locale">Service de l'animation locale</option>
+                  <option value="Service de gestion des moyens communs">Service de gestion des moyens communs</option>
+                  <option value="Service de l'environnement et de la protection">Service de l'environnement et de la protection</option>
+                  <option value="Service des affaires économiques et de la police administrative">Service des affaires économiques et de la police administrative</option>
+                </select>
+              </div>
+              <button type="submit"
+                class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                Enregistrer la sortie
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Historique des opérations -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">
+            <i class="fas fa-history mr-2"></i>Historique des opérations
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type d'élément</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opération</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opérateur</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Les opérations seront ajoutées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- État du stock -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">
+            <i class="fas fa-warehouse mr-2"></i>État du stock
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type d'élément</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité en stock</th>
+                </tr>
+              </thead>
+              <tbody id="stock-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Les stocks seront affichés ici -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    /***********************
+     * Gestion du Login et de l'Inventaire
+     ***********************/
+    // Définition des comptes avec les nouveaux identifiants
+    const comptes = [
+      { username: 'hakima', password: 'Hakima_73', options: ['Toutes options'] },
+      { username: 'magasin_bmh', password: 'Bettana_bmh', options: ['Option A', 'Option B'] },
+      { username: 'magasin_arrondissement', password: 'Bettana_mg', options: ['Option C', 'Option D'] }
+    ];
+
+    // Variable pour mémoriser l'opérateur connecté
+    let currentOperator = null;
+
+    // Gestion du formulaire de login
+    const loginForm = document.getElementById('login-form');
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const usernameInput = document.getElementById('username').value.trim();
+      const passwordInput = document.getElementById('password').value.trim();
+      
+      const user = comptes.find(u => u.username === usernameInput && u.password === passwordInput);
+      
+      if (user) {
+        currentOperator = user.username;
+        document.getElementById('login-container').classList.add('hidden');
+        document.getElementById('app-container').classList.remove('hidden');
+        document.getElementById('logged-user').textContent = user.username;
+        console.log("Utilisateur connecté : " + user.username, user.options);
+        showNotification("Connexion réussie", 'success');
+      } else {
+        alert("Identifiants incorrects !");
+      }
+    });
+
+    // Bouton de déconnexion
+    const logoutBtn = document.getElementById('logout-btn');
+    logoutBtn.addEventListener('click', () => {
+      document.getElementById('login-form').reset();
+      document.getElementById('app-container').classList.add('hidden');
+      document.getElementById('login-container').classList.remove('hidden');
+      currentOperator = null;
+      showNotification("Déconnexion réussie", 'success');
+    });
+
+    /***********************
+     * Gestion de l'Inventaire avec localStorage
+     ***********************/
+    // Initialisation de la structure d'inventaire dans localStorage si elle n'existe pas
+    if (!localStorage.getItem('inventory')) {
+        localStorage.setItem('inventory', JSON.stringify({
+            items: {},          // Stocke les quantités actuelles
+            transactions: [],   // Stocke l'historique des transactions
+            itemTypes: []       // Stocke les types d'articles pour l'autocomplétion
+        }));
+    }
+
+    // Fonction pour afficher des notifications
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-md text-white ${
+            type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        }`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        // Supprime la notification après 3 secondes
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Fonction pour mettre à jour l'inventaire
+    // Le paramètre "operateur" est ajouté pour enregistrer l'utilisateur qui réalise l'opération
+    function updateInventory(type, quantity, isAddition = true, service = null, operateur = currentOperator) {
+        const inventory = JSON.parse(localStorage.getItem('inventory'));
+        
+        // Initialise le type d'article s'il n'existe pas
+        if (!inventory.items[type]) {
+            inventory.items[type] = 0;
+        }
+
+        // Met à jour la quantité
+        if (isAddition) {
+            inventory.items[type] += quantity;
+        } else {
+            // Vérifie qu'il y a suffisamment de stock
+            if (inventory.items[type] < quantity) {
+                throw new Error(`Stock insuffisant pour ${type}`);
+            }
+            inventory.items[type] -= quantity;
+        }
+
+        // Enregistre la transaction avec l'opérateur
+        inventory.transactions.push({
+            type,
+            quantity,
+            isAddition,
+            service,
+            operateur,
+            date: new Date().toISOString()
+        });
+
+        // Ajoute le type d'article aux types uniques s'il n'est pas déjà présent
+        if (!inventory.itemTypes) {
+            inventory.itemTypes = [];
+        }
+        if (!inventory.itemTypes.includes(type)) {
+            inventory.itemTypes.push(type);
+        }
+
+        // Sauvegarde l'inventaire mis à jour
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+        
+        // Met à jour les affichages
+        updateStockDisplay();
+        updateHistoryDisplay();
+        document.dispatchEvent(new Event('inventoryUpdated'));
+    }
+
+    // Fonction pour mettre à jour le dropdown du formulaire de sortie
+    function updateTypeDropdown() {
+        const typeSelect = document.getElementById('type-sortie');
+        const inventory = JSON.parse(localStorage.getItem('inventory') || '{"items":{}}');
+        
+        // Sauvegarde la sélection actuelle si existante
+        const currentSelection = typeSelect.value;
+        
+        // Efface les options actuelles sauf l'option placeholder
+        while (typeSelect.options.length > 1) {
+            typeSelect.remove(1);
+        }
+        
+        // Ajoute les options pour chaque type d'article présent dans l'inventaire
+        Object.entries(inventory.items)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .forEach(([type, quantity]) => {
+                if (quantity > 0) { // Affiche uniquement si le stock est > 0
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type; // Affiche uniquement le type sans la quantité
+                    typeSelect.appendChild(option);
+                }
+            });
+        
+        // Restaure la sélection si elle est toujours valide
+        if (currentSelection && [...typeSelect.options].some(opt => opt.value === currentSelection)) {
+            typeSelect.value = currentSelection;
+        }
+    }
+
+    // Met à jour le dropdown lorsque l'inventaire est mis à jour
+    document.addEventListener('inventoryUpdated', updateTypeDropdown);
+
+    // Fonction pour mettre à jour le tableau d'état du stock
+    function updateStockDisplay() {
+        const tableBody = document.getElementById('stock-table-body');
+        const inventory = JSON.parse(localStorage.getItem('inventory'));
+        
+        // Efface le contenu actuel du tableau
+        tableBody.innerHTML = '';
+
+        // Vérifie s'il y a des articles
+        if (Object.keys(inventory.items).length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                    <i class="fas fa-box-open mr-2"></i>
+                    Aucun élément en stock
+                </td>
+            `;
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+
+        // Ajoute chaque article au tableau
+        Object.entries(inventory.items)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .forEach(([type, quantity]) => {
+                // Filtre les articles selon l'utilisateur connecté
+                if (currentOperator === 'hakima' || type.startsWith(currentOperator)) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${type}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm ${quantity === 0 ? 'text-red-600' : 'text-gray-900'}">
+                                ${quantity}
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+    }
+
+    // Fonction pour formater une date ISO en format lisible (fr-FR)
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        return new Intl.DateTimeFormat('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
+    }
+
+    // Fonction pour mettre à jour le tableau de l'historique des transactions
+    // Les opérations récentes s'affichent en haut, avec une couleur de fond verte pour la réception et rouge pour la sortie
+    function updateHistoryDisplay() {
+        const tableBody = document.getElementById('history-table-body');
+        const inventory = JSON.parse(localStorage.getItem('inventory'));
+        
+        // Efface le contenu actuel du tableau
+        tableBody.innerHTML = '';
+
+        // Vérifie s'il y a des transactions
+        if (!inventory.transactions || inventory.transactions.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Aucune opération enregistrée
+                </td>
+            `;
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+
+        // Ajoute chaque transaction au tableau en ordre chronologique inverse (nouvelles en haut)
+        inventory.transactions
+            .slice()
+            .reverse()
+            .forEach(transaction => {
+                // Filtre les transactions selon l'utilisateur connecté
+                if (currentOperator === 'hakima' || transaction.operateur === currentOperator) {
+                    // Détermine la couleur de fond selon le type d'opération
+                    const rowBg = transaction.isAddition ? 'bg-green-50' : 'bg-red-50';
+                    const row = document.createElement('tr');
+                    row.className = rowBg;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatDate(transaction.date)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${transaction.type}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${transaction.isAddition ? 'Réception' : 'Sortie'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${transaction.quantity}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${transaction.service || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${transaction.operateur}
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+    }
+
+    // Gestion du formulaire de réception
+    document.getElementById('reception-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const type = document.getElementById('type-reception').value.trim();
+        const quantity = parseInt(document.getElementById('quantity-reception').value);
+
+        try {
+            // Pour la réception, aucun service n'est renseigné
+            updateInventory(type, quantity, true, null, currentOperator);
+            showNotification(`Réception de ${quantity} ${type} enregistrée avec succès`);
+            this.reset();
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    });
+
+    // Gestion du formulaire de sortie
+    document.getElementById('sortie-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const type = document.getElementById('type-sortie').value.trim();
+        const quantity = parseInt(document.getElementById('quantity-sortie').value);
+        const service = document.getElementById('service').value.trim();
+
+        try {
+            updateInventory(type, quantity, false, service, currentOperator);
+            showNotification(`Sortie de ${quantity} ${type} vers ${service} enregistrée avec succès`);
+            this.reset();
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    });
+
+    // Fonction pour mettre à jour le datalist des types d'articles pour l'autocomplétion
+    function updateItemTypesList() {
+        const inventory = JSON.parse(localStorage.getItem('inventory'));
+        const datalist = document.getElementById('item-types-list');
+        
+        // Efface les options actuelles
+        datalist.innerHTML = '';
+        
+        // Ajoute chaque type d'article unique de l'inventaire
+        if (inventory.itemTypes) {
+            inventory.itemTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                datalist.appendChild(option);
+            });
+        }
+    }
+
+    // Initialisation des affichages et dropdowns à DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStockDisplay();
+        updateTypeDropdown();
+        updateHistoryDisplay();
+        updateItemTypesList();
+        showNotification("Connexion réussie", 'success');
+    });
+  </script>
+</body>
+</html>
